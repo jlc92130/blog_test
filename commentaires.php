@@ -3,6 +3,11 @@
    <head>
        <title>liste des billets</title>
        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+       <meta name="viewport" content="width=device-width, initial-scale=1">
+       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+       <link href="style.css" rel="stylesheet" />
+       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
    </head>
    <body>
      <h1> Mon super blog!</h1>
@@ -26,7 +31,7 @@
      ?>
      <div class="news">
         <h3>
-          <?php echo htmlspecialchars($donnees['titre']); ?>;
+          <?php echo htmlspecialchars($donnees['titre']); ?>
           <em>le <?php echo $donnees['date_creation_fr']; ?></em>
         </h3>
         <p><?php htmlspecialchars($donnees['contenu']); ?></p>
@@ -47,15 +52,22 @@
     $page = (!empty($_GET['page']) ? $_GET['page'] : 1); // numero de page par defaut
     $debut = ($page-1) * $limite; // premier element a recuprer
 
-    $resp = $bdd-> prepare('SELECT id_billet, auteur, commentaire, DATE_FORMAT(date_commentaire,\'%d/%m/%Y à %Hh%imin%ss\') AS date_com FROM commentaires WHERE id_billet = ? ORDER BY date_commentaire DESC LIMIT :debut , :limite');
-    $resp -> execute(array($_GET['billet']));
+    $resp = $bdd-> prepare('SELECT id_billet, auteur, commentaire, DATE_FORMAT(date_commentaire,\'%d/%m/%Y à %Hh%imin%ss\') AS date_com FROM commentaires WHERE id_billet = :id_billet ORDER BY date_commentaire DESC LIMIT :debut , :limite');
+    $resp->bindValue(
+      ':id_billet',
+      $_GET['billet'],
+      PDO::PARAM_INT
+    );
     $resp->bindValue(
       ':debut',
       $debut,
-      ':limit',
+      PDO::PARAM_INT
+    );
+    $resp->bindValue(
+      ':limite',
       $limite,
       PDO::PARAM_INT
-      )
+    );
       $resp->execute();
     $donnees=$resp->fetch(); // tableau contenant tout les commentaires pour id_billet=billet
     if (!empty($donnees)) {
@@ -70,14 +82,15 @@
         echo nl2br(htmlspecialchars($donnees['commentaire']));
       }
     }
-      catch (Exception $e)
-      {
-        die('Erreur :' . $e->getMessage());
-      }
+    else
+    {
+        echo 'Aucun commentaires';
+    }
         $resp->closeCursor();
       ?>
       <?php
-        $req=$bdd->query('SELECT COUNT(*) AS nb_commentaires FROM commentaires ');
+        $req=$bdd->prepare('SELECT COUNT(*) AS nb_commentaires FROM commentaires WHERE id_billet=?');
+        $req->execute(array($_GET['billet']));
         $nb_commentaires=$req->fetch();
         $req->closeCursor();
         $nb_pages=ceil($nb_commentaires['nb_commentaires']/2);
@@ -86,13 +99,16 @@
       <p>page :
        <div class="container">
            <ul class="pagination">
-      <?php
-        for($i=0;$i<=$nb_pages;$i++) {
-      ?>
-        <li><a href="commentaires.php?page=<?php echo $page ?>"><?php echo $i ?></a></li>
+          <?php
+            for($i=1;$i<=$nb_pages;$i++) {
+          ?>
+              <li><a href="commentaires.php?page=<?php echo $page ?>"><?php echo $i ?></a></li>
       <?php
         }
       ?>
+        </ul>
+     </div>
+   </p>
 
 
 
