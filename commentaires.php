@@ -23,7 +23,7 @@
      {
        die('Erreur : '.$e->getMessage());
      }
-     $req = $bdd->prepare('SELECT titre, contenu, DATE_FORMAT(date_creation,\'%d/%m/%Y à %Hh%imin%ss\') AS date_creation_fr FROM billets WHERE id = ?');
+     $req = $bdd->prepare('SELECT id,titre, contenu, DATE_FORMAT(date_creation,\'%d/%m/%Y à %Hh%imin%ss\') AS date_creation_fr FROM billets WHERE id = ?');
      $req->execute(array($_GET['billet']));
      $donnees=$req->fetch();
 
@@ -52,10 +52,11 @@
     $page = (!empty($_GET['page']) ? $_GET['page'] : 1); // numero de page par defaut
     $debut = ($page-1) * $limite; // premier element a recuprer
 
-    $resp = $bdd-> prepare('SELECT id_billet, auteur, commentaire, DATE_FORMAT(date_commentaire,\'%d/%m/%Y à %Hh%imin%ss\') AS date_com FROM commentaires WHERE id_billet = :id_billet ORDER BY date_commentaire DESC LIMIT :debut , :limite');
+    $resp = 'SELECT id_billet, auteur, commentaire, DATE_FORMAT(date_commentaire,\'%d/%m/%Y à %Hh%imin%ss\') AS date_com FROM commentaires WHERE id_billet = :id_billet ORDER BY date_commentaire DESC LIMIT :debut,:limite';
+    $resp = $bdd-> prepare($resp);
     $resp->bindValue(
       ':id_billet',
-      $_GET['billet'],
+    $_GET['billet'],
       PDO::PARAM_INT
     );
     $resp->bindValue(
@@ -68,9 +69,9 @@
       $limite,
       PDO::PARAM_INT
     );
-      $resp->execute();
-    $donnees=$resp->fetch(); // tableau contenant tout les commentaires pour id_billet=billet
-    if (!empty($donnees)) {
+    $resp->execute();
+
+    // if (!empty($resp)) {
     while($donnees=$resp->fetch())
      {
     ?>
@@ -78,16 +79,21 @@
     <?php echo htmlspecialchars($donnees['auteur']); ?> le
     <em><?php echo htmlspecialchars($donnees['date_com']); ?></em>
     </p>
+    <p>
     <?php
         echo nl2br(htmlspecialchars($donnees['commentaire']));
+    ?>
+    </p>
+    <?php
       }
-    }
-    else
-    {
-        echo 'Aucun commentaires';
-    }
+    // }
+    //   else
+    // {
+    //     echo 'Aucun commentaires';
+    // }
         $resp->closeCursor();
       ?>
+      <!-- we want two comments for every page -->
       <?php
         $req=$bdd->prepare('SELECT COUNT(*) AS nb_commentaires FROM commentaires WHERE id_billet=?');
         $req->execute(array($_GET['billet']));
@@ -102,7 +108,7 @@
           <?php
             for($i=1;$i<=$nb_pages;$i++) {
           ?>
-              <li><a href="commentaires.php?page=<?php echo $page ?>"><?php echo $i ?></a></li>
+              <li><a href="commentaires.php?page=<?php echo $i ?>&billet=<?= echo $_GET['billet'] ?>"><?php echo $i ?></a></li>
       <?php
         }
       ?>
