@@ -30,11 +30,11 @@
      if (!empty($donnees)) {
      ?>
      <div class="news">
-        <h3>
-          <?php echo htmlspecialchars($donnees['titre']); ?>
-          <em>le <?php echo $donnees['date_creation_fr']; ?></em>
-        </h3>
-        <p><?php htmlspecialchars($donnees['contenu']); ?></p>
+       <h3>
+         <?php echo htmlspecialchars($donnees['titre']); ?>
+         <em>le <?php echo $donnees['date_creation_fr']; ?></em>
+       </h3>
+        <p><?php echo htmlspecialchars($donnees['contenu']); ?></p>
       </div>
       <?php
       }
@@ -108,7 +108,7 @@
           <?php
             for($i=1;$i<=$nb_pages;$i++) {
           ?>
-              <li><a href="commentaires.php?page=<?php echo $i ?>&billet=<?= echo $_GET['billet'] ?>"><?php echo $i ?></a></li>
+              <li><a href="commentaires.php?page=<?php $i ?>&billet=<?= $_GET['billet'] ?>"><?php echo $i ?></a></li>
       <?php
         }
       ?>
