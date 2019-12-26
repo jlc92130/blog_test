@@ -86,11 +86,7 @@
     </p>
     <?php
       }
-    // }
-    //   else
-    // {
-    //     echo 'Aucun commentaires';
-    // }
+
         $resp->closeCursor();
       ?>
       <!-- we want two comments for every page -->
@@ -101,6 +97,17 @@
         $req->closeCursor();
         $nb_pages=ceil($nb_commentaires['nb_commentaires']/2);
        ?>
+
+       <!-- ajout commentaires -->
+       <h3>Veuillez entrer votre commentaire</h3>
+       <form  action="admin/commentaires_post.php" method="post">
+         <label for="auteur" >Pseudo</label>
+         <input type="text" name="auteur" id="auteur"><br/>
+         <label for="commentaire">Message</label>:
+         <input type="text" name="commentaire" id="commentaire"><br/>
+         <input type="hidden" name="id_billet" value="<?php echo $_GET['billet']; ?>" />
+         <input type="submit" value="Envoyer">
+       </form>
 
       <p>page :
        <div class="container">

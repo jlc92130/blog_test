@@ -34,7 +34,7 @@
      $debut = ($page-1) * $limite; // premier element a recuprer
 
 
-     $reponse = $bdd->prepare('SELECT  id,titre, contenu, DATE_FORMAT(date_creation, \'%d/%m/%Y à %Hh%imin%ss\') AS date_creation_fr FROM billets ORDER BY date_creation DESC LIMIT :debut, :limite');
+     $reponse = $bdd->prepare('SELECT  id,titre, contenu, DATE_FORMAT(date_creation, \'%d/%m/%Y à %Hh%imin%ss\') AS date_creation_fr FROM billets ORDER BY date_creation DESC LIMIT :debut, :limite') or die(print_r($bdd->errorInfos()));
      $reponse->bindValue(
        ':debut',
        $debut,
@@ -46,6 +46,7 @@
        PDO::PARAM_INT
      );
      $reponse->execute();
+
 
       while ($donnees = $reponse->fetch())
       {
@@ -62,8 +63,8 @@
             echo nl2br(htmlspecialchars($donnees['contenu']));
             ?>
           </p>
-          <img src="copyright.php?image=voyage.jpg" />
-        
+          <img src="copyright.php?image=images/voyage.jpg" />
+
 
           <h5>
             <em><a href="commentaires.php?billet=<?php echo $donnees['id']; ?>">commentaire</a></em>
