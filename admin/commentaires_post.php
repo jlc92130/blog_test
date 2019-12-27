@@ -45,7 +45,7 @@
         echo 'Vous devez remplir tous les champs';
       }
 
-header('Location: ../commentaires.php?billet=$donnees[\'id_billet\']');
+header('Location: ../commentaires.php?billet=' . $_POST['id_billet']);
 ?>
 </body>
 </html>
